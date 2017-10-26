@@ -61,6 +61,7 @@ $Go=Read-Host -prompt "Proceed with computer restart? (Y / N)"
 #Perform the replacement
 If($Go -eq "Y") {
     ForEach ($comp in $cn) {
+        #If a computer does not respond within 3 attempts, move on to the next one in the list
         if (Test-Connection -ComputerName $comp.name -Count 3 -Quiet) {
             Rename-Computer -ComputerName $comp.name -NewName ($comp.name -Replace "$search","$replace") -DomainCredential $creds -Force -Restart #-WhatIf
         }
