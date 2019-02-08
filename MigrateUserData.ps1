@@ -3,8 +3,10 @@ Start-Transcript -Path C:\MigrateLogs.txt -Force -NoClobber -Append | Out-Null
 
 # Get domain credentials. Customize `-Username $CUser` to match your environment if you
 # have a specific naming scheme for domain admin accounts vs regular users
-# Clear $Creds at the start, set $CUser to the currently logged-on user
+
 $Creds = $null
+
+# Set $CUser to the currently logged-on user
 $CUser = [System.Security.Principal.WindowsIdentity]::GetCurrent() | select -ExpandProperty Name
 
 while ($null -eq $Creds) {
@@ -14,7 +16,7 @@ while ($null -eq $Creds) {
         Write-Host "Currently logged in with a domain admin account"
         $Creds = Get-Credential -Username "$CUser" -Message "Enter Password for $CUser"
     }
-    elseif (([Security.Principal.WindowsPrincipal][System.Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole("Domain Admins") -eq $false) {
+    else {
         Write-Host "Currently logged in with a non-domain admin account"
         $Creds = Get-Credential -Username "$CUser" -Message "Enter Password for $CUser"
     }
