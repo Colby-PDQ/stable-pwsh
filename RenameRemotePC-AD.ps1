@@ -29,13 +29,11 @@ $Confirm = $null
 
 while ($Confirm -ne "y") {
     #Collects the name of the computer to be changed. 
-    Write-Host ""
     $DestComputer = Read-Host -Prompt "Current computer name "
-    Write-host "Current computer name: " $DestComputer
 
     # Collect the new name for the computer.
-    Write-Host ""
     $NewName = Read-Host -Prompt "New computer name "
+    Clear-Host
     
     # Confirm the name change.
     Write-Host ""
@@ -46,20 +44,23 @@ while ($Confirm -ne "y") {
 }
 
 # Rename the destination computer
-Write-Host ""
+Write-Host -ForegroundColor Green "Renaming $DestComputer to $NewName..."
 Rename-Computer -ComputerName $DestComputer -NewName $NewName -DomainCredential  $Creds -Force
+Read-Host -Prompt "Review errors (if present). Press any key to continue"
 Write-Host ""
         
 # Prompts for whether or not you want to restart the renamed computer immediately.
-Write-Host -ForegroundColor Yellow "A restart is required to finish renaming. Issues will occur if too much time passes without a restart."
-$Reboot = Read-host -Prompt "Do you want to restart the computer? (y/n)"
+Write-Host -ForegroundColor Yellow "A restart is required to finish renaming."
+$Reboot = Read-host -Prompt "Restart the computer now? (y/n)"
 Write-Host ""
         
 If ($Reboot -eq "y") {
     Restart-Computer -ComputerName $DestComputer -Credential $Creds -Force
+    Read-Host -Prompt "Review errors (if present). Press any key to exit"
 }
 elseif ($Reboot -eq "n") {
     Write-Host -ForegroundColor Yellow "Remember to restart the computer within the next 10-15 minutes to avoid possible communication issues!"
+    Read-Host -Prompt "Press any key to exit"
 }
 
 # Stop logging
