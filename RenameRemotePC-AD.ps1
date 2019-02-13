@@ -30,12 +30,12 @@ $Confirm = $null
 while ($Confirm -ne "y") {
     #Collects the name of the computer to be changed. 
     Write-Host ""
-    $DestComputer = Read-Host -Prompt "Enter the name of the computer you want to change the name of: "
+    $DestComputer = Read-Host -Prompt "Current computer name "
     Write-host "Current computer name: " $DestComputer
 
     # Collect the new name for the computer.
     Write-Host ""
-    $NewName = Read-Host -Prompt "Please enter the computer name you want to use "
+    $NewName = Read-Host -Prompt "New computer name "
     
     # Confirm the name change.
     Write-Host ""
