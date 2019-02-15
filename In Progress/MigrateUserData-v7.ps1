@@ -51,23 +51,21 @@ while ($Loop) {
         
         $HostComputer = Read-Host -Prompt 'Enter the HOST name'
 
-        if ( -not (Test-Connection -ComputerName $HostComputer -Count 2 -Quiet) ) {
+        if ( -not (Test-Connection -ComputerName $HostComputer -Count 1 -Quiet) ) {
             do {
                 Write-Warning "$HostComputer is not online. Please enter another computer name."
                 $HostComputer = Read-Host -Prompt 'Enter the HOST name'
-            } until (Test-Connection -ComputerName $HostComputer -Count 2 -Quiet)
-            continue
+            } until (Test-Connection -ComputerName $HostComputer -Count 1 -Quiet)
         }
         Clear-Host
 
         $DestComputer = Read-Host -Prompt 'Enter the DESTINATION name'
 
-        if ( -not ( Test-Connection -ComputerName $DestComputer -Count 2 -Quiet ) ) {
+        if ( -not ( Test-Connection -ComputerName $DestComputer -Count 1 -Quiet ) ) {
             do {
                 Write-Warning "$DestComputer is not online. Please enter another computer name."
                 $DestComputer = Read-Host -Prompt 'Enter the DESTINATION name'
-            } until (Test-Connection -ComputerName $DestComputer -Count 2 -Quiet)
-            continue
+            } until (Test-Connection -ComputerName $DestComputer -Count 1 -Quiet)
         }
         Clear-Host
 
@@ -76,16 +74,19 @@ while ($Loop) {
         if ( -not ( Test-Path -Path "\\$HostComputer\c$\Users\$Username" -PathType Container ) ) {
             do {
                 Write-Warning "$Username could not be found on $HostComputer. Please enter another user profile."
-                $Username = Read-Host -Prompt "Enter user to be copied"
+                $Username = Read-Host -Prompt "Enter the profile (User) name"
             } until (Test-Path -Path "\\$HostComputer\c$\Users\$Username" -PathType Container)
-            continue
         }
+        Clear-Host
 
         Write-Host -ForegroundColor Yellow "User profile to copy is: $Username"
         Write-Host -ForegroundColor Yellow "HOST computer name is: $HostComputer"
         Write-Host -ForegroundColor Yellow "DESTINATION computer name is: $DestComputer"
         Write-Host ""
-        $ConfirmEntry = Read-Host -Prompt "Is this information correct? (y/n)"
+        
+        while ( $ConfirmEntry -ne 'y' -and $ConfirmEntry -ne "n") {
+            $ConfirmEntry = Read-Host -Prompt "Is this information correct? (y/n)"
+        }
     }
     Clear-Host
 
