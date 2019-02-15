@@ -110,7 +110,7 @@ while ($Loop) {
             Break
         }
 
-        Robocopy.exe $Source $Destination /w:1 /r:1 /E /IS /NP /NFL
+        Robocopy.exe $Source $Destination /w:1 /r:1 /E /IS /NFL /ETA
     }
 
     # Variables for the scheduled task to be created on the destination machine
