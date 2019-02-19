@@ -109,7 +109,7 @@ while ($Loop) {
     elseif ($choice = "2") {
         $compname = Read-Host "Enter the remote computer name "
         $HostReport = "C:\ProgramData\Microsoft\Windows\WlanReport"
-        $DestReport = "\\MSD-TechServer\MSDSoftware\Miscellaneous\Reports\$compname"
+        $DestReport = "$env:UserProfile\Desktop\$compname"
         Clear-Host
 
         Write-Host -ForegroundColor Green "Active NIC information"
