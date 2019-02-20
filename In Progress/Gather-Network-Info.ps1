@@ -43,6 +43,7 @@ while ($Loop) {
     $compname = $null
     $isWireless = $null
     $lNICinfo = $null
+    $localDNSTarget = $null
     $rNICinfo = $null
     
     #Show choices
@@ -99,14 +100,36 @@ while ($Loop) {
         
         Write-Host -ForegroundColor Green "Testing LAN connection..."
         Write-Host ""
-        Test-NetConnection alpha -TraceRoute -Hops 5 -WarningAction SilentlyContinue | Select-Object @{Name = 'Testing Address (Alpha)'; Expression = {[string]::join(" | ", ($_.ResolvedAddresses))}}, @{Name = 'Ping Success?'; Expression = {($_.PingSucceeded)}}
-        Write-Host ""
+        Test-NetConnection $localDNSTarget -TraceRoute -Hops 5 -WarningAction SilentlyContinue | Select-Object @(
+            @{
+                Name = 'Testing Address (Alpha)'; Expression = {[string]::join(" | ", ($_.ResolvedAddresses))}
+            }
+            @{
+                Name = 'Ping Success?'; Expression = {($_.PingSucceeded)}
+            }
+        )
+        Write-Progress -Activity "TraceRoute" -Completed
         
         Write-Host -ForegroundColor Green "Testing internet connection..."
         Write-Host ""
-        Test-NetConnection google.com -TraceRoute -Hops 5 -WarningAction SilentlyContinue | Select-Object @{Name = 'Domain used to test'; Expression = {[string]::join(" | ", ($_.ComputerName))}}, @{Name = 'Resolved IP'; Expression = {($_.RemoteAddress)}}, @{Name = 'Ping status'; Expression = {[string]::join(" | ", ($_.PingSucceeded))}}, @{Name = 'Traceroute Result'; Expression = {[string]::join(", ", ($_.Traceroute -Join ' --> '))}}
+        Test-NetConnection google.com -TraceRoute -Hops 5 -WarningAction SilentlyContinue | Select-Object @(
+            @{
+                Name = 'Domain used to test'; Expression = {[string]::join(" | ", ($_.ComputerName))}
+            } 
+            @{
+                Name = 'Resolved IP'; Expression = {($_.RemoteAddress)}
+            } 
+            @{
+                Name = 'Ping status'; Expression = {[string]::join(" | ", ($_.PingSucceeded))}
+            }
+            @{
+                Name = 'Traceroute Result'; Expression = {[string]::join(", ", ($_.Traceroute -Join ' --> '))}
+            }
+        )
+        Write-Progress -Activity "TraceRoute" -Completed
         $choice = $null
     }
+
     elseif ($choice = "2") {
         $compname = Read-Host "Enter the remote computer name "
         $HostReport = "C:\ProgramData\Microsoft\Windows\WlanReport"
@@ -160,6 +183,7 @@ while ($Loop) {
             Write-Host ""
             Test-NetConnection google.com -TraceRoute -Hops 5 -WarningAction SilentlyContinue| Select-Object @{Name = 'Domain used to test'; Expression = {[string]::join(" | ", ($_.ComputerName))}}, @{Name = 'Resolved IP'; Expression = {($_.RemoteAddress)}}, @{Name = 'Ping status'; Expression = {[string]::join(" | ", ($_.PingSucceeded))}}, @{Name = 'Traceroute (5 hops)'; Expression = {[string]::join(", ", ($_.Traceroute -Join ' --> '))}}
         }
+        
         if ($isWireless -eq "y") {
             Invoke-Command -ComputerName $compname -Credential $creds -ScriptBlock {
                 New-PSDrive -Name Source -PSProvider FileSystem -Root $Using:HostReport -Credential $Using:creds
