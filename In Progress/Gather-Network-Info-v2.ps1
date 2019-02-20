@@ -52,6 +52,7 @@ while ($Loop) {
         Write-Host ""
         $choice = Read-Host "Choose an option from above"
         $isWireless = Read-Host -Prompt "Is this a wireless device? (y/n)"
+        $localDNSTarget = Read-Host -Prompt "LAN target for DNS test"
         Clear-Host
     } 
 
@@ -100,10 +101,9 @@ while ($Loop) {
         
         Write-Host -ForegroundColor Green "Testing LAN connection..."
         Write-Host ""
-        $localDNSTarget = Read-Host -Prompt "Enter DNS resolution target name"
         Test-NetConnection $localDNSTarget -TraceRoute -Hops 5 -WarningAction SilentlyContinue | Select-Object @(
             @{
-                Name = 'Testing Address (Alpha)'; Expression = {[string]::join(" | ", ($_.ResolvedAddresses))}
+                Name = 'Testing Address (DNS)'; Expression = {[string]::join(" | ", ($_.ResolvedAddresses))}
             }
             @{
                 Name = 'Ping Success?'; Expression = {($_.PingSucceeded)}
@@ -177,15 +177,15 @@ while ($Loop) {
         Invoke-Command -ComputerName $compname -Credential $creds -ScriptBlock {
             Write-Host -ForegroundColor Green "Testing LAN connection..."
             Write-Host ""
-            Test-NetConnection $localDNSTarget -TraceRoute -Hops 5 -WarningAction SilentlyContinue | Select-Object @(
+            Test-NetConnection $Using:localDNSTarget -TraceRoute -Hops 5 -WarningAction SilentlyContinue | Select-Object @(
                 @{
-                    Name = 'Testing Address (Alpha)'; Expression = {[string]::join(" | ", ($_.ResolvedAddresses))}
+                    Name = 'Testing Address (DNS)'; Expression = {[string]::join(" | ", ($_.ResolvedAddresses))}
                 }
                 @{
                     Name = 'Ping Success?'; Expression = {($_.PingSucceeded)}
                 }
             )
-            Write-Progress -Activity "TraceRoute" -Completed
+            Write-Progress -Activity "Internal TraceRoute" -Completed
 
             Test-NetConnection google.com -TraceRoute -Hops 5 -WarningAction SilentlyContinue | Select-Object @(
                 @{
@@ -201,7 +201,7 @@ while ($Loop) {
                     Name = 'Traceroute Result'; Expression = {[string]::join(", ", ($_.Traceroute -Join ' --> '))}
                 }
             )
-            Write-Progress -Activity "TraceRoute" -Complete
+            Write-Progress -Activity "External TraceRoute" -Complete
         }
         
         if ($isWireless -eq "y") {
