@@ -19,7 +19,7 @@ while ($null -eq $Creds) {
     }
     else {
         Write-Host "Currently logged in with a non-domain admin account"
-        $Creds = Get-Credential -Username "$*DomainAdmin" -Message "Enter Password for $DomainAdmin"
+        $Creds = Get-Credential -Username "DomainAdmin" -Message "Enter Password for DomainAdmin"
     }
 }
 Clear-Host
@@ -90,6 +90,7 @@ while ($Loop) {
                 Expression = {[string]::join(";", ($_.DefaultIPGateway))}
             }
         )
+
         Write-Host ""
         Write-Host -ForegroundColor Green "Active NIC information"
         Write-Host "If any of the fields below are empty, there may be a problem"
@@ -115,7 +116,6 @@ while ($Loop) {
         Write-Host -ForegroundColor Green "Active NIC information"
         Write-Host "If any of the fields below are empty, there may be a problem"
         $rNICinfo = Invoke-Command -ComputerName $compname -Credential $creds {
-            
             Get-CimInstance Win32_NetworkAdapterConfiguration -ComputerName $compname | Where-Object {$_.IPEnabled} | Select-Object @(
                 @{
                     Name       = 'Name of the machine'
@@ -144,6 +144,10 @@ while ($Loop) {
                 }
             )
         }
+
+        Write-Host ""
+        Write-Host -ForegroundColor Green "Active NIC information"
+        Write-Host "If any of the fields below are empty, there may be a problem"
         $rNICinfo
 
         Invoke-Command -ComputerName $compname -Credential $creds -ScriptBlock {
