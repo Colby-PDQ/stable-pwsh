@@ -245,19 +245,40 @@ while ($Loop) {
             )
             Write-Progress -Activity "External TraceRoute" -Complete
         }
+        Write-Host ""
         
         if ($isWireless -eq "y") {
-
+            
+            $netshPatterns = @(
+                "Description",
+                "Physical",
+                "State",
+                "SSID",
+                "Radio",
+                "Connection",
+                "Channel",
+                "Receive",
+                "Transmit",
+                "Signal",
+                "Profile"
+            )
             $HostReport = "C:\ProgramData\Microsoft\Windows\WlanReport"
             $DestReport = "$env:UserProfile\Desktop\$compname"
+
             Invoke-Command -ComputerName $compname -Credential $creds -ScriptBlock {
 
                 # Create connection between host and remote computer to transfer the final netsh report back
                 New-PSDrive -Name Source -PSProvider FileSystem -Root $Using:HostReport -Credential $Using:creds
                 New-PSDrive -Name Destination -PSProvider FileSystem -Root $Using:DestReport -Credential $Using:creds
 
+                # This service is required for netsh - sometimes it isn't running, so start it
                 Get-Service -Name dot3svc -ErrorAction SilentlyContinue | Restart-Service
-                netsh wlan show wlanreport
+
+                # Gather stats from the currently-connected wireless device
+                netsh wlan show interfaces | Select-String -Pattern $Using:netshPatterns | Select-Object -Expand Line
+            
+                Write-Host "Generating detailed report..."
+                netsh wlan show wlanreport | Out-Null
 
                 Write-Host -ForegroundColor Green "Copying report to $Using:DestReport"
                 Write-Host ""
