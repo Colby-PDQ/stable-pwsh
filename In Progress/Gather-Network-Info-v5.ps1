@@ -1,4 +1,4 @@
-$ErrorActionPreference = "SilentlyContinue"
+#$ErrorActionPreference = "SilentlyContinue"
 Set-ExecutionPolicy -Scope CurrentUser -ExecutionPolicy Bypass -Force
 Clear-Host
 
@@ -266,15 +266,15 @@ while ($Loop) {
                 "Signal",
                 "Profile"
             )
-            $HostReport = "C:\ProgramData\Microsoft\Windows\WlanReport"
+            $HostReport = "C:\ProgramData\Microsoft\Windows\WlanReport\"
             $DestRoot = "\\MSD-TechServer\MSDSoftware\Miscellaneous\Reports\netsh-WLAN"
-            $DestReport = "\\MSD-TechServer\MSDSoftware\Miscellaneous\Reports\netsh-WLAN\$compname"
+            $DestReport = "\\MSD-TechServer\MSDSoftware\Miscellaneous\Reports\netsh-WLAN\$compname\"
 
             Invoke-Command -ComputerName $compname -Credential $creds -ScriptBlock {
 
                 # Create connection between host and remote computer to transfer the final netsh report back
-                New-PSDrive -Name Source -PSProvider FileSystem -Root $Using:HostReport -Credential $Using:creds | #Out-Null
-                New-PSDrive -Name Destination -PSProvider FileSystem -Root $Using:DestRoot -Credential $Using:creds | #Out-Null
+                New-PSDrive -Name Source -PSProvider FileSystem -Root "$Using:HostReport" | Out-Null
+                New-PSDrive -Name Destination -PSProvider FileSystem -Root "$Using:DestRoot" | Out-Null
 
                 # This service is required for netsh - sometimes it isn't running, so start it
                 Get-Service -Name dot3svc -ErrorAction SilentlyContinue | Restart-Service
@@ -295,8 +295,8 @@ while ($Loop) {
                 Write-Host ""
                 Write-Host -ForegroundColor Green "Copying report to $Using:DestReport"
                 Write-Host ""
-                New-Item -Path $Using:DestRoot -Name $compname -ItemType "Directory" -Force
                 Robocopy.exe $Using:HostReport $Using:DestReport /NDL /NFL /NJH /NJS
+                #Copy-Item -Path $Using:HostReport -Destination (New-Item "$Using:DestReport" -Type container -Force) -Recurse
 
                 Remove-PSDrive -Name Source 
                 Remove-PSDrive -Name Destination
