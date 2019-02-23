@@ -167,9 +167,6 @@ while ($Loop) {
         $compname = Read-Host "Enter the remote computer name "
         Clear-Host
 
-        Write-Host -ForegroundColor Green "Active NIC information"
-        Write-Host "If any of the fields below are empty, there may be a problem"
-
         # Filter out any NIC that is not active or physical - only tested in a heavily Dell environment
         $activeNIC = Invoke-Command -ComputerName $compname -Credential $creds {
             Get-NetAdapter | Where-Object {$_.HardwareInterface -eq $True -and $_.Status -eq "Up"} | Select-Object -ExpandProperty InterfaceDescription
@@ -211,7 +208,7 @@ while ($Loop) {
         $rNICinfo
 
         Invoke-Command -ComputerName $compname -Credential $creds -ScriptBlock {
-            Write-Host -ForegroundColor Green "Testing LAN connection..."
+            Write-Host -ForegroundColor Green "Testing DNS resolution"
             Write-Host ""
             Test-NetConnection $Using:localDNSTarget -TraceRoute -Hops 5 -WarningAction SilentlyContinue | Select-Object @(
                 @{
