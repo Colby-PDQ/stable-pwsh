@@ -6,6 +6,9 @@ Clear-Host
 # have a specific naming scheme for domain admin accounts vs regular users
 $Creds = $null
 
+# Name of the machine the script is running from
+$cPC = $env:COMPUTERNAME
+
 # Set $CUser to the currently logged-on user
 $CUser = [System.Security.Principal.WindowsIdentity]::GetCurrent() | Select-Object -ExpandProperty Name
 Clear-Host
@@ -267,22 +270,15 @@ while ($Loop) {
                 "Signal",
                 "Profile"
             )
-            $DestRoot = "\\MSD-TechServer\MSDSoftware\Miscellaneous\Reports\netsh-WLAN"
-            $DestReport = "\\MSD-TechServer\MSDSoftware\Miscellaneous\Reports\netsh-WLAN\$compname\"
-            $HostReport = "C:\ProgramData\Microsoft\Windows\WlanReport\"
+            $DestReport = "\\$cPC\c$\Users\Public\netsh-WLAN\$compname"
+            $HostReport = "\\$compname\c$\ProgramData\Microsoft\Windows\WlanReport"
 
             Invoke-Command -ComputerName $compname -Credential $creds -ScriptBlock {
-
-                # Create connection between host and remote computer to transfer the final netsh report back
-                New-PSDrive -Name Source -PSProvider FileSystem -Root "$Using:HostReport" | Out-Null
-                New-PSDrive -Name Destination -PSProvider FileSystem -Root "$Using:DestRoot" | Out-Null
 
                 # This service is required for netsh - sometimes it isn't running, so start it
                 Get-Service -Name dot3svc -ErrorAction SilentlyContinue | Restart-Service
 
                 # Gather stats from the currently-connected wireless device
-                Write-Host ""
-                Write-Host ""
                 Write-Host ""
                 Write-Host -ForegroundColor Green "Information from NIC and currently connected network"
                 netsh wlan show interfaces | Select-String -Pattern $Using:netshPatterns | Select-Object -Expand Line
@@ -296,24 +292,8 @@ while ($Loop) {
                 Write-Host ""
                 Write-Host -ForegroundColor Green "Copying report to $Using:DestReport"
                 Write-Host ""
-                $CopyParams = @{
-                    FilePath     = 'Robocopy.exe'
-                    ArgumentList = @(
-                        $Using:HostReport
-                        $Using:DestReport
-                        '/NDL' 
-                        '/NFL' 
-                        '/NJH' 
-                        '/NJS'
-                    )
-                    Credential   = $using:creds
-                }
-                Start-Process @CopyParams
-                #Copy-Item -Path $Using:HostReport -Destination (New-Item "$Using:DestReport" -Type container -Force) -Recurse
-
-                Remove-PSDrive -Name Source 
-                Remove-PSDrive -Name Destination
             }
+            Robocopy.exe $HostReport $DestReport wlan-report-latest.html /w:1 /r:1 /E /IS /NFL /ETA
             Start-Process -FilePath "$DestReport\wlan-report-latest.html"
         }
     }
@@ -326,3 +306,4 @@ while ($Loop) {
         Read-Host "Review errors (if present). Press any key to exit"
     }
 }
+netsh wlan show wlanreport -Destination "\\MSD-TechServer\MSDSoftware\Miscellaneous\Reports\netsh-WLAN"
