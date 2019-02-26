@@ -6,7 +6,7 @@ Start-Transcript -Path C:\MigrateLogs.txt -Force -NoClobber -Append | Out-Null
 $Creds = $null
 
 # Set $CUser to the currently logged-on user
-$CUser = [System.Security.Principal.WindowsIdentity]::GetCurrent() | select -ExpandProperty Name
+$CUser = [System.Security.Principal.WindowsIdentity]::GetCurrent() | Select-Object -ExpandProperty Name
 Clear-Host
 
 while ($null -eq $Creds) {
@@ -79,12 +79,14 @@ while ($Loop) {
         }
         Clear-Host
 
-        Write-Host -ForegroundColor Yellow "User profile to copy is: $Username"
-        Write-Host -ForegroundColor Yellow "HOST computer name is: $HostComputer"
-        Write-Host -ForegroundColor Yellow "DESTINATION computer name is: $DestComputer"
+        Write-Host -ForegroundColor Green "User profile to copy is: $Username"
+        Write-Host -ForegroundColor Green "HOST computer name is: $HostComputer"
+        Write-Host -ForegroundColor Green "DESTINATION computer name is: $DestComputer"
         Write-Host ""
         
         while ( $ConfirmEntry -ne 'y' -and $ConfirmEntry -ne "n") {
+            Write-Host -ForegroundColor Yellow "Warning - Verify that user - $Username - is logged off before continuing"
+            Write-Host -ForegroundColor Yellow "Failure to do so will likely result in files being skipped due to being in-use"
             $ConfirmEntry = Read-Host -Prompt "Is this information correct? (y/n)"
         }
     }
