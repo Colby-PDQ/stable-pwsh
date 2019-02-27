@@ -167,7 +167,7 @@ while ($Loop) {
 
     elseif ($choice = "2") {
         $compname = Read-Host "Enter the remote computer name "
-        $DestReport = "\\msd-techserver\MSDSoftware\Miscellaneous\Reports\netsh-WLAN\$compname"
+        $DestReport = "\\server\Reports\netsh-WLAN\$compname"
         $HostReport = "\\$compname\C$\ProgramData\Microsoft\Windows\WlanReport"
         Clear-Host
 
