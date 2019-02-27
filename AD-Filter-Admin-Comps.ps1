@@ -1,5 +1,3 @@
-Start-Transcript "Update members of AD group.txt" -NoClobber -Append -Force
-
 # Get the account name for each user in the selected group (Identity)
 $ADMember = Get-ADGroupMember -Identity "All Administrators" -Recursive | Select-Object -ExpandProperty SamAccountName
 
@@ -15,5 +13,3 @@ foreach ($comp in $ADComp) {
     # Set the 'extensionAttribute1` attribute to "DND" (Do Not Disable)
     Set-ADComputer -Identity "$comp" -Replace @{extensionAttribute1="DND"} #-WhatIf
     }
-
-Stop-Transcript
