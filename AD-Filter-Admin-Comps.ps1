@@ -9,7 +9,7 @@ $ADComp = foreach ($member in $ADMember) {
 
 foreach ($comp in $ADComp) {
     # Add each computer in $ADComp to _All Admin Computers distribution group
-    Add-ADGroupMember -Identity "_All Admin Computers" -Members "$comp" #-WhatIf
+    Add-ADGroupMember -Identity "_All Admin Computers" -Members "$comp" -WhatIf
     # Set the 'extensionAttribute1` attribute to "DND" (Do Not Disable)
-    Set-ADComputer -Identity "$comp" -Replace @{extensionAttribute1="DND"} #-WhatIf
+    Set-ADComputer -Identity "$comp" -Replace @{extensionAttribute1="DND"} -WhatIf
     }
