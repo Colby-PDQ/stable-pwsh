@@ -18,15 +18,17 @@ $ADPull = Get-ADComputer -Filter {
     Name -notlike '*server*' -and
     Enabled -eq $True
 
-} -Properties LastLogonTimeStamp,extensionAttribute1 | Where-Object {$_.extensionAttribute1 -ne 'DND'} | Select-Object -ExpandProperty Name | Out-GridView
+} -Properties LastLogonTimeStamp,extensionAttribute1 | Where-Object {$_.extensionAttribute1 -ne 'DND'}
 
+# Display results of the filter for verification
+$ADPull | Select-Object -ExpandProperty Name | Out-GridView
 $confirm = Read-Host -Prompt "Proceed? (y/n)"
 
 if ($confirm -eq "y") {
     foreach ($comp in $ADPull) {
         # Disable each computer before moving it.
         Set-ADComputer -Identity $comp -Enabled $false -WhatIf
-        Move-ADObject -Identity $comp -TargetPath "OU=Computers,DC=contoso,DC=com" -WhatIf
+        Move-ADObject -Identity $comp.DistinguishedName -TargetPath "OU=Computers,DC=contoso,DC=com" -WhatIf
     }
 }
 
