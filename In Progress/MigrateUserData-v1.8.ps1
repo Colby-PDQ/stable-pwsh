@@ -4,71 +4,17 @@ Start-Transcript -Path C:\MigrateLogs.txt -Force -NoClobber -Append | Out-Null
 # Get domain credentials. Customize `-Username $CUser` to match your environment if you
 # have a specific naming scheme for domain admin accounts vs regular users
 $Creds = $null
+$validCreds = $null
 Clear-Host
 
-#Test User Credentials Function
-Function TestUserCredentials {
-    ClearUserInfo   
-    #Get user credentials
-    $Cred = Get-Credential -Message "Enter Your Credentials (Domain\Username)"
-    if ($Cred -eq $Null) {
-        Write-Host "Please enter your username in the form of Domain\UserName and try again" -BackgroundColor Black -ForegroundColor Yellow
-        Rerun
-        Break                          
-    }
-
-    #Parse provided user credentials
-    $DomainNetBIOS = $Cred.username.Split("{\}")[0]
-    $UserName = $Cred.username.Split("{\}")[1]
-    $Password = $Cred.GetNetworkCredential().password
-    
-    Write-Host "`n"
-    Write-Host "Checking Credentials for $DomainNetBIOS\$UserName" -BackgroundColor Black -ForegroundColor White
-    Write-Host "***************************************"
-
-    If ($DomainNetBIOS -eq $Null -or $UserName -eq $Null) {
-        Write-Host "Please enter your username in the form of Domain\UserName and try again" -BackgroundColor Black -ForegroundColor Yellow
-        Rerun
-        Break
-    }
-    #    Checks if the domain in question is reachable, and get the domain FQDN.
-    Try {
-        $DomainFQDN = (Get-ADDomain $DomainNetBIOS).DNSRoot
-    }
-    Catch {
-        Write-Host "Error: Domain was not found: " $_.Exception.Message -BackgroundColor Black -ForegroundColor Red
-        Write-Host "Please make sure the domain NetBios name is correct, and is reachable from this computer" -BackgroundColor Black -ForegroundColor Red
-        Rerun
-        Break
-    }
-    
-    #Checks user credentials against the domain
-    $DomainObj = "LDAP://" + $DomainFQDN
-    $DomainBind = New-Object System.DirectoryServices.DirectoryEntry($DomainObj, $UserName, $Password)
-    $DomainName = $DomainBind.distinguishedName
-    
-    If ($DomainName -eq $Null) {
-        Write-Host "Domain $DomainFQDN was found: True" -BackgroundColor Black -ForegroundColor Green
-        
-        $UserExist = Get-ADUser -Server $DomainFQDN -Properties LockedOut -Filter {sAMAccountName -eq $UserName}
-        If ($UserExist -eq $Null) {
-            Write-Host "Error: Username $Username does not exist in $DomainFQDN Domain." -BackgroundColor Black -ForegroundColor Red
-            Rerun
-            Break
-        }
-    }
-    
-        Write-Host "Authentication failed for $DomainNetBIOS\$UserName with the provided password." -BackgroundColor Black -ForegroundColor Red
-        Write-Host "Please confirm the password, and try again..." -BackgroundColor Black -ForegroundColor Red
-        Rerun
-        Break
-    }
-     
-    Else {
-        Write-Host "SUCCESS: The account $Username successfully authenticated against the domain: $DomainFQDN" -BackgroundColor Black -ForegroundColor Green
-        Rerun
-        Break
-    }
+#Test User Credentials
+while (!$validCreds) {
+	$cred = Get-Credential -Message "Please input credentials for "
+	try {
+		$validCreds = Get-ADDomain -Server alpha -Credential $cred
+	}
+	catch {Write-Host "Incorrect username or password. Try again."}
+}
 
 Clear-Host
 
