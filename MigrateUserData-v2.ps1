@@ -9,11 +9,11 @@ Clear-Host
 
 #Test User Credentials
 while (!$validCreds) {
-	$cred = Get-Credential -Message "Please input credentials for "
-	try {
-		$validCreds = Get-ADDomain -Server alpha -Credential $cred
-	}
-	catch {Write-Host ForegroundColor Red "Incorrect username or password. Try again."}
+    $cred = Get-Credential -Message "Please input credentials for "
+    try {
+        $validCreds = Get-ADDomain -Server alpha -Credential $cred
+    }
+    catch {Write-Host ForegroundColor Red "Incorrect username or password. Try again."}
 }
 
 Clear-Host
