@@ -157,6 +157,8 @@ while ($Loop) {
             while ($Confirm -ne "y") {
                 #Collect the new name for the computer.
                 Write-Host ""
+                Write-Host -ForegroundColor Yellow "Old (current) name - $HostComputer"
+                Write-Host -ForegroundColor Yellow "Recommended name - $HostComputer-New"
                 $NewName = Read-Host -Prompt "Please enter the computer name you want to use "
     
                 #Confirm the name change.
