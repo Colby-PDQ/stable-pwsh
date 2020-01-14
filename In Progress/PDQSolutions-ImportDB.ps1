@@ -130,7 +130,6 @@ until ($input -eq 'q')
     
         Robocopy.exe $Source $Destination /w:1 /r:1 /E /IS /NFL /ETA >> "robocopy-$HostComputer.txt"
     }
-}
      
 # Prompt user to restart the process. If 'n', exit the script. If 'y', go back to the beginning.
 $repeat = Read-Host -Prompt "Start new session? (y/n)"
