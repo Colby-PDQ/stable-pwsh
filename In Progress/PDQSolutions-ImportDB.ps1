@@ -64,12 +64,16 @@ while ($Loop) {
     
         Write-Host -ForegroundColor Green "Ticket number is: $ticketNum"
 
-        $ProductList = Get-ChildItem -Path "$ticketPath"
+        $DBAvailable = Get-ChildItem -Path "$ticketPath" -Filter "Database.db" -Recurse
         
-        foreach ($Folder in $ProductList){
-            Get-ChildItem ($Folder).PSPath -Filter "Database.db" -Recurse
-        }
-        
+        foreach ( $Folder in $DBAvailable ) {
+            if ( ($_.directory) -like "*Inventory*" ) {
+                $InventoryDBFile = $DBAvailable | Where-Object { $_.Directory -like "*Inventory*" } | Select-Object -ExpandProperty FullName
+            }
+            elseif (($_.directory) -like "*Deploy*" ) {
+                $DeployDBFile = $DBAvailable | Where-Object { $_.Directory -like "*Deploy*" } | Select-Object -ExpandProperty FullName #Get-ChildItem ($Db).PSPath -Filter "Database.db" -Recurse | Select-Object -ExpandProperty FullName
+            }
+        } 
 
         if ( (($ProductList).count -eq 2)) {
             do {
@@ -80,56 +84,56 @@ while ($Loop) {
 
                 $PickProduct = Read-Host -Prompt 'Choose an option'
 
-                switch ($PickProduct)
-     {
-           '1' {
-                cls
-                Write-Host "Importing Deploy database from $ticketPath"
-           } '2' {
-                cls
-                'You chose option #2'
-           } '3' {
-                cls
-                'You chose option #3'
-           } 'q' {
-                return
-           }
-     }
-     pause
+                switch ($PickProduct) {
+                    '1' {
+                        cls
+                        Write-Host "Importing Deploy database from $ticketPath"
+                        Copy-Item -Path $ticketPath
+                    } '2' {
+                        cls
+                        'You chose option #2'
+                    } '3' {
+                        cls
+                        'You chose option #3'
+                    } 'q' {
+                        return
+                    }
+                }
+                pause
+            }
+            until ($input -eq 'q')
+        } until (Test-Path "$ticketPath" -PathType Container)
+    }
+            
+    Write-Host -ForegroundColor Green "Database to import: $HostComputer"
+    Write-Host -ForegroundColor Green "DESTINATION computer name is: $DestComputer"
+    Write-Host ""
+            
+    while ( $ConfirmEntry -ne 'y' -and $ConfirmEntry -ne "n") {
+        Write-Host -ForegroundColor Yellow "Warning - Verify that user - $Username - is logged off before continuing"
+        Write-Host -ForegroundColor Yellow "Failure to do so will likely result in files being skipped due to being in-use"
+        $ConfirmEntry = Read-Host -Prompt "Is this information correct? (y/n)"
+    }
 }
-until ($input -eq 'q')
-            } until (Test-Path "$ticketPath" -PathType Container)
-        }
+Clear-Host
+    
+# Begin copying databases
             
-        Write-Host -ForegroundColor Green "Database to import: $HostComputer"
-        Write-Host -ForegroundColor Green "DESTINATION computer name is: $DestComputer"
+foreach ( $Db in $DbsToCopy ) {
+    $Source = Join-Path -Path $SourceRoot -ChildPath $Db
+    $Destination = Join-Path -Path $DestinationRoot -ChildPath $Db
+    
+    if ( -not (Test-Path -Path $Source -PathType Container) ) {
+        Write-Warning "Could not find path`t$Source. Is this the correct profile folder location?"
+        Write-Warning "Check $SourceRoot to verify the folder structure, then try again."
+        Write-Warning "Exiting..."
         Write-Host ""
-            
-        while ( $ConfirmEntry -ne 'y' -and $ConfirmEntry -ne "n") {
-            Write-Host -ForegroundColor Yellow "Warning - Verify that user - $Username - is logged off before continuing"
-            Write-Host -ForegroundColor Yellow "Failure to do so will likely result in files being skipped due to being in-use"
-            $ConfirmEntry = Read-Host -Prompt "Is this information correct? (y/n)"
-        }
+        $SourcePathFail = $true
+        Break
     }
-    Clear-Host
     
-    # Begin copying databases
-            
-    foreach ( $Folder in $FoldersToCopy ) {
-        $Source = Join-Path -Path $SourceRoot -ChildPath $Folder
-        $Destination = Join-Path -Path $DestinationRoot -ChildPath $Folder
-    
-        if ( -not (Test-Path -Path $Source -PathType Container) ) {
-            Write-Warning "Could not find path`t$Source. Is this the correct profile folder location?"
-            Write-Warning "Check $SourceRoot to verify the folder structure, then try again."
-            Write-Warning "Exiting..."
-            Write-Host ""
-            $SourcePathFail = $true
-            Break
-        }
-    
-        Robocopy.exe $Source $Destination /w:1 /r:1 /E /IS /NFL /ETA >> "robocopy-$HostComputer.txt"
-    }
+    Robocopy.exe $Source $Destination /w:1 /r:1 /E /IS /NFL /ETA >> "robocopy-$HostComputer.txt"
+}
      
 # Prompt user to restart the process. If 'n', exit the script. If 'y', go back to the beginning.
 $repeat = Read-Host -Prompt "Start new session? (y/n)"
