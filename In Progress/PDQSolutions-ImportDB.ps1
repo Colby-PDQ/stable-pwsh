@@ -71,7 +71,7 @@ while ($Loop) {
                 $InventoryDBFile = $DBAvailable | Where-Object { $_.Directory -like "*Inventory*" } | Select-Object -ExpandProperty FullName
             }
             elseif (($_.directory) -like "*Deploy*" ) {
-                $DeployDBFile = $DBAvailable | Where-Object { $_.Directory -like "*Deploy*" } | Select-Object -ExpandProperty FullName #Get-ChildItem ($Db).PSPath -Filter "Database.db" -Recurse | Select-Object -ExpandProperty FullName
+                $DeployDBFile = $DBAvailable | Where-Object { $_.Directory -like "*Deploy*" } | Select-Object -ExpandProperty FullName
             }
         } 
 
