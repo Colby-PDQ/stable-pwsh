@@ -34,9 +34,11 @@ $InventoryProcess = "PDQInventoryConsole"
 $InventoryService = "PDQInventory"
 
 $StandardDBName = "database.db"
+$BackupDBName = "database.db.old"
 $DBLocationRoot = "\\fs01\Support\"
 $DeployDB = "PDQDeploy\"
 $InventoryDB = "PDQInventory\"
+$LocalPDQfolder = "$env:ProgramData\Admin Arsenal\"
 
 while ($Loop) {
     # Set variables for use later
@@ -86,28 +88,28 @@ while ($Loop) {
 
                 switch ($PickProduct) {
                     '1' {
+                        $Destination = "$LocalPDQfolder\$DeployDB"
                         cls
                         Write-Host "Importing Deploy database from $ticketPath"
-                        Copy-Item -Path $ticketPath
+                        Rename-Item -Path "$Destination\$StandardDBName" -NewName $BackupDBName
+                        Copy-Item -Path $ticketPath -Destination $Destination
                     } '2' {
                         cls
                         'You chose option #2'
                     } '3' {
                         cls
                         'You chose option #3'
-                    } 'q' {
+                    } 'q (quit)' {
                         return
                     }
                 }
                 pause
             }
             until ($input -eq 'q')
-        } until (Test-Path "$ticketPath" -PathType Container)
+        }
     }
             
-    Write-Host -ForegroundColor Green "Database to import: $HostComputer"
-    Write-Host -ForegroundColor Green "DESTINATION computer name is: $DestComputer"
-    Write-Host ""
+    Write-Host "New database imported."
             
     while ( $ConfirmEntry -ne 'y' -and $ConfirmEntry -ne "n") {
         Write-Host -ForegroundColor Yellow "Warning - Verify that user - $Username - is logged off before continuing"
