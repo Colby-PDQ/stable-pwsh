@@ -83,6 +83,7 @@ while ($Loop) {
                 Write-Host " Press '1' for Deploy."
                 Write-Host " Press '2' for Inventory."
                 Write-Host " Press '3' for Both."
+                Write-Host " Press 'q' to quit."
 
                 $PickProduct = Read-Host -Prompt 'Choose an option'
 
@@ -100,6 +101,7 @@ while ($Loop) {
                         cls
                         'You chose option #3'
                     } 'q (quit)' {
+                        cls
                         return
                     }
                 }
@@ -111,11 +113,14 @@ while ($Loop) {
             
     Write-Host "New database imported."
             
-    while ( $ConfirmEntry -ne 'y' -and $ConfirmEntry -ne "n") {
-        Write-Host -ForegroundColor Yellow "Warning - Verify that user - $Username - is logged off before continuing"
-        Write-Host -ForegroundColor Yellow "Failure to do so will likely result in files being skipped due to being in-use"
-        $ConfirmEntry = Read-Host -Prompt "Is this information correct? (y/n)"
+    while ( $ConfirmEntry -ne 'y' ) {
+        $ConfirmEntry = Read-Host -Prompt "Restore original database? (y/n)"
     }
+
+        if ($ConfirmEntry -eq 'n') {
+
+        }
+
 }
 Clear-Host
     
