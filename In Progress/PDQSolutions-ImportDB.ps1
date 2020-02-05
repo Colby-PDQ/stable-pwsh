@@ -95,11 +95,13 @@ while ($Loop) {
                         Rename-Item -Path "$Destination\$StandardDBName" -NewName $BackupDBName
                         Copy-Item -Path $ticketPath -Destination $Destination
                     } '2' {
+                        $Destination = "$LocalPDQfolder\$InventoryDB"
                         cls
-                        'You chose option #2'
+                        Write-Host "Importing Inventory database from $ticketPath"
+                        Rename-Item -Path "$Destination\$StandardDBName" -NewName $BackupDBName
+                        Copy-Item -Path $ticketPath -Destination $Destination
                     } '3' {
                         cls
-                        'You chose option #3'
                     } 'q (quit)' {
                         cls
                         return
@@ -117,16 +119,16 @@ while ($Loop) {
         $ConfirmEntry = Read-Host -Prompt "Restore original database? (y/n)"
     }
 
-        if ($ConfirmEntry -eq 'n') {
+    if ($ConfirmEntry -eq 'n') {
 
-        }
+    }
 
 }
 Clear-Host
     
 # Begin copying databases
             
-foreach ( $Db in $DbsToCopy ) {
+<#foreach ( $Db in $DbsToCopy ) {
     $Source = Join-Path -Path $SourceRoot -ChildPath $Db
     $Destination = Join-Path -Path $DestinationRoot -ChildPath $Db
     
@@ -138,9 +140,7 @@ foreach ( $Db in $DbsToCopy ) {
         $SourcePathFail = $true
         Break
     }
-    
-    Robocopy.exe $Source $Destination /w:1 /r:1 /E /IS /NFL /ETA >> "robocopy-$HostComputer.txt"
-}
+}#>
      
 # Prompt user to restart the process. If 'n', exit the script. If 'y', go back to the beginning.
 $repeat = Read-Host -Prompt "Start new session? (y/n)"
