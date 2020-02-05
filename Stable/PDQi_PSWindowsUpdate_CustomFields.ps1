@@ -32,19 +32,8 @@ $InstalledDate = Get-WULastInstallationDate
 
 [array]$CustomInfo = "Computer Name,$CustomFieldName1,$CustomFieldName2"
 
-if (($CheckedDate -gt $time) -eq $false) {
-    $Checked = "True"
-}
-else {
-    $Checked = "False"
-}
-
-if (($InstalledDate -gt $time) -eq $false) {
-    $Installed = "True"
-}
-else {
-    $Installed = "False"
-}
+$Checked = $CheckedDate -lt $time
+$Installed = $InstalledDate -lt $time
 
 $CustomInfo += "$ComputerName,$Checked,$Installed"
 
