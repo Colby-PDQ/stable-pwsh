@@ -10,6 +10,12 @@
 .PARAMETER ServerHostName
     The hostname of the computer that you have PDQ Inventory installed on. This script will use Invoke-Command to connect to the specificed hostname.
     Defaults to "PDQSERVER".
+.PARAMETER CustomFieldLastUpdateCheck
+    The name of the Custom Field that stores whether or not the number of days since the last time the target checked for updates is greater than the number of days specified by -Days.
+    Defaults to "Last Update Check Older Than $Days Days".
+.PARAMETER CustomFieldLastUpdateInstalled
+    The name of the Custom Field that stores whether or not the number of days since the last time the target installed updates is greater than the number of days specified by -Days.
+    Defaults to "Last Update Installed Over $Days Days Ago".
 .EXAMPLE
     I have typically had this as a Tool in Inventory that I could run on-demand as needed (as well as remove possible conflicts with how Inventory handles running scripts vs how Deploy does it),
     but there is no reason you could not create a package in Deploy and schedule it if desired. Just be sure to test thoroughly.
@@ -35,18 +41,25 @@ param (
     [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
-    $ServerHostName = "PDQSERVER"
+    $ServerHostName = "PDQSERVER",
+
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $CustomFieldLastUpdateCheck = "Last Update Check Older Than $Days Days",
+
+    [Parameter(Mandatory = $true)]
+    [ValidateNotNullOrEmpty()]
+    [string]
+    $CustomFieldLastUpdateInstalled = "Last Update Installed Over $Days Days Ago"
 )
 
 $Time = (Get-Date).Adddays(- $Days)
 
-$CustomFieldName1 = "Last Update Check Older Than $Days Days"
-$CustomFieldName2 = "Last Update Installed Over $Days Days Ago"
-
 $CheckedDate   = Get-WULastScanSuccessDate
 $InstalledDate = Get-WULastInstallationDate
 
-[array]$CustomInfo = "Computer Name,$CustomFieldName1,$CustomFieldName2"
+[array]$CustomInfo = "Computer Name,$CustomFieldLastUpdateCheck,$CustomFieldLastUpdateInstalled"
 
 $Checked   = $CheckedDate   -lt $Time
 $Installed = $InstalledDate -lt $Time
