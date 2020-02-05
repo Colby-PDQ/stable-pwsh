@@ -46,9 +46,7 @@ else {
     $Installed = "False"
 }
 
-$ComputerName | ForEach-Object {
-    $CustomInfo += "$_,$Checked,$Installed"
-}
+$CustomInfo += "$ComputerName,$Checked,$Installed"
 
 Invoke-Command -ComputerName PDQSERVER -ScriptBlock { 
     ($TempFile = New-TemporaryFile) 
