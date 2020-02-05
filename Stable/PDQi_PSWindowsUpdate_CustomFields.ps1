@@ -33,22 +33,18 @@
 
 [CmdletBinding()]
 param (
-    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]    
     [int32]
     $Days = 30,
 
-    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $ServerHostName = "PDQSERVER",
 
-    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $CustomFieldLastUpdateCheck = "Last Update Check Older Than $Days Days",
 
-    [Parameter(Mandatory = $true)]
     [ValidateNotNullOrEmpty()]
     [string]
     $CustomFieldLastUpdateInstalled = "Last Update Installed Over $Days Days Ago"
