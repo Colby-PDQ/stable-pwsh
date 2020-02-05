@@ -21,23 +21,23 @@
 #>
 
 $Days = 30
-$time = (Get-Date).Adddays( - ($Days))
+$Time = (Get-Date).Adddays(- $Days)
 
-$CustomFieldName1 = "Last Update Check older than 30 days"
+$CustomFieldName1 = "Last Update Check Older Than 30 Days"
 $CustomFieldName2 = "Last Update Installed Over 30 Days Ago"
-$ComputerName = $env:COMPUTERNAME
 
-$CheckedDate = Get-WULastScanSuccessDate
+$CheckedDate   = Get-WULastScanSuccessDate
 $InstalledDate = Get-WULastInstallationDate
 
 [array]$CustomInfo = "Computer Name,$CustomFieldName1,$CustomFieldName2"
 
-$Checked = $CheckedDate -lt $time
-$Installed = $InstalledDate -lt $time
+$Checked   = $CheckedDate   -lt $Time
+$Installed = $InstalledDate -lt $Time
 
-$CustomInfo += "$ComputerName,$Checked,$Installed"
+$CustomInfo += "$env:COMPUTERNAME,$Checked,$Installed"
 
 Invoke-Command -ComputerName PDQSERVER -ScriptBlock { 
-    ($TempFile = New-TemporaryFile) 
-    ($Using:CustomInfo | Out-File $TempFile) 
-    (PDQInventory ImportCustomFields -FileName $TempFile.FullName -AllowOverwrite) }
+    $TempFile = New-TemporaryFile
+    $Using:CustomInfo | Out-File $TempFile
+    PDQInventory ImportCustomFields -FileName $TempFile.FullName -AllowOverwrite
+}
